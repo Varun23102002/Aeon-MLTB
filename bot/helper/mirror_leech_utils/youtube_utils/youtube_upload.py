@@ -18,29 +18,6 @@ from bot.helper.mirror_leech_utils.youtube_utils.youtube_helper import YouTubeHe
 LOGGER = getLogger(__name__)
 
 
-def get_valid_category_id(service, region_code="US", fallback="27"):
-    """
-    Fetch a valid categoryId using the YouTube API for the given region.
-    Returns a valid categoryId as a string. Defaults to fallback if not found.
-    """
-    try:
-        categories = (
-            service.videoCategories()
-            .list(part="snippet", regionCode=region_code)
-            .execute()
-        )
-        # Prefer fallback if present, else take any valid id
-        for item in categories.get("items", []):
-            if item["id"] == fallback:
-                return fallback
-        # If fallback not available, just return first category
-        if categories.get("items"):
-            return categories["items"][0]["id"]
-    except Exception as e:
-        LOGGER.error(f"Failed to fetch video categories: {e}")
-    return fallback
-
-
 class YouTubeUpload(YouTubeHelper):
     def __init__(
         self,
@@ -48,7 +25,7 @@ class YouTubeUpload(YouTubeHelper):
         path,
         privacy="unlisted",
         tags=None,
-        category="27",
+        category="22",
         description=None,
         playlist_id=None,
         upload_mode="playlist",
@@ -211,11 +188,6 @@ class YouTubeUpload(YouTubeHelper):
                 self.listener.on_upload_error, f"YouTube authorization failed: {e!s}"
             )
             return
-
-        # Get a valid category ID for this session, fallback to self.category if possible
-        self.valid_category_id = get_valid_category_id(
-            self.service, fallback=str(self.category)
-        )
 
         LOGGER.info(f"Uploading to YouTube: {self._path}")
         self._updater = SetInterval(self.update_interval, self.progress)
@@ -551,8 +523,7 @@ class YouTubeUpload(YouTubeHelper):
 
         title = file_name
         privacy_status = self.privacy
-        # Use the valid category id fetched at upload start, fallback to "22"
-        category_id = getattr(self, "valid_category_id", str(self.category))
+        category_id = self.category
         description_base = (
             self.description if self.description else f"Uploaded: {file_name}"
         )
@@ -602,29 +573,11 @@ class YouTubeUpload(YouTubeHelper):
                         f"HTTP error {err.resp.status} for {file_name}, retrying... ({retries}/5)"
                     )
                     continue
-                # If invalidCategoryId, fallback to a more generic one and retry once
                 error_content = (
                     err.content.decode("utf-8")
                     if err.content
                     else f"Unknown error (status: {err.resp.status})"
                 )
-                if err.resp.status == 400 and "invalidCategoryId" in error_content:
-                    LOGGER.warning(
-                        f"Invalid categoryId {category_id} for {file_name}. Refetching and retrying once."
-                    )
-                    # Try to fetch a new valid category id (prefer 22, fallback to first available)
-                    new_category_id = get_valid_category_id(
-                        self.service, fallback="22"
-                    )
-                    if new_category_id != str(category_id):
-                        body["snippet"]["categoryId"] = new_category_id
-                        category_id = new_category_id
-                        insert_request = self.service.videos().insert(
-                            part=",".join(body.keys()),
-                            body=body,
-                            media_body=media_body,
-                        )
-                        continue  # retry with new category
                 LOGGER.error(
                     f"YouTube upload for {file_name} failed: {error_content}"
                 )
