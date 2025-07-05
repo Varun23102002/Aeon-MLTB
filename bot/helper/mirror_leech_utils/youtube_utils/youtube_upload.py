@@ -17,16 +17,18 @@ from bot.helper.mirror_leech_utils.youtube_utils.youtube_helper import YouTubeHe
 
 LOGGER = getLogger(__name__)
 
+
 def get_valid_category_id(service, region_code="US", fallback="22"):
     """
     Fetch a valid categoryId using the YouTube API for the given region.
     Returns a valid categoryId as a string. Defaults to fallback if not found.
     """
     try:
-        categories = service.videoCategories().list(
-            part="snippet",
-            regionCode=region_code
-        ).execute()
+        categories = (
+            service.videoCategories()
+            .list(part="snippet", regionCode=region_code)
+            .execute()
+        )
         # Prefer fallback if present, else take any valid id
         for item in categories.get("items", []):
             if item["id"] == fallback:
@@ -37,6 +39,7 @@ def get_valid_category_id(service, region_code="US", fallback="22"):
     except Exception as e:
         LOGGER.error(f"Failed to fetch video categories: {e}")
     return fallback
+
 
 class YouTubeUpload(YouTubeHelper):
     def __init__(
@@ -210,7 +213,9 @@ class YouTubeUpload(YouTubeHelper):
             return
 
         # Get a valid category ID for this session, fallback to self.category if possible
-        self.valid_category_id = get_valid_category_id(self.service, fallback=str(self.category))
+        self.valid_category_id = get_valid_category_id(
+            self.service, fallback=str(self.category)
+        )
 
         LOGGER.info(f"Uploading to YouTube: {self._path}")
         self._updater = SetInterval(self.update_interval, self.progress)
@@ -608,12 +613,16 @@ class YouTubeUpload(YouTubeHelper):
                         f"Invalid categoryId {category_id} for {file_name}. Refetching and retrying once."
                     )
                     # Try to fetch a new valid category id (prefer 22, fallback to first available)
-                    new_category_id = get_valid_category_id(self.service, fallback="22")
+                    new_category_id = get_valid_category_id(
+                        self.service, fallback="22"
+                    )
                     if new_category_id != str(category_id):
                         body["snippet"]["categoryId"] = new_category_id
                         category_id = new_category_id
                         insert_request = self.service.videos().insert(
-                            part=",".join(body.keys()), body=body, media_body=media_body
+                            part=",".join(body.keys()),
+                            body=body,
+                            media_body=media_body,
                         )
                         continue  # retry with new category
                 LOGGER.error(
