@@ -18,7 +18,7 @@ from bot.helper.mirror_leech_utils.youtube_utils.youtube_helper import YouTubeHe
 LOGGER = getLogger(__name__)
 
 
-def get_valid_category_id(service, region_code="US", fallback="22"):
+def get_valid_category_id(service, region_code="US", fallback="27"):
     """
     Fetch a valid categoryId using the YouTube API for the given region.
     Returns a valid categoryId as a string. Defaults to fallback if not found.
@@ -48,7 +48,7 @@ class YouTubeUpload(YouTubeHelper):
         path,
         privacy="unlisted",
         tags=None,
-        category="24",
+        category="27",
         description=None,
         playlist_id=None,
         upload_mode="playlist",
@@ -65,7 +65,7 @@ class YouTubeUpload(YouTubeHelper):
         self.upload_mode = upload_mode
         super().__init__()
         self.is_uploading = True
-
+        
     def _upload_playlist(self, folder_path, playlist_name):
         """Uploads all videos in a folder and adds them to a new playlist."""
         video_infos = []
