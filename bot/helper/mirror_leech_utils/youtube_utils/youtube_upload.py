@@ -25,7 +25,7 @@ class YouTubeUpload(YouTubeHelper):
         path,
         privacy="unlisted",
         tags=None,
-        category="22",
+        category="27",
         description=None,
         playlist_id=None,
         upload_mode="playlist",
