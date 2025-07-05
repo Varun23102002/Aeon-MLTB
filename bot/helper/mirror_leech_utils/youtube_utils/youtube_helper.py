@@ -67,7 +67,8 @@ class YouTubeHelper:
         token_path = self.token_path
 
         if user_id:
-            token_path = f"tokens/{user_id}.pickle"
+            if user_id:
+    token_path = f"{user_id}.pickle"  # looks in root directory
 
         if ospath.exists(token_path):
             LOGGER.info(f"Authorize YouTube with {token_path}")
