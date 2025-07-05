@@ -67,7 +67,6 @@ class YouTubeHelper:
         token_path = self.token_path
 
         if user_id:
-            if user_id:
             token_path = f"tokens/{user_id}.pickle"
 
 
