@@ -65,7 +65,7 @@ class YouTubeUpload(YouTubeHelper):
         self.upload_mode = upload_mode
         super().__init__()
         self.is_uploading = True
-        
+
     def _upload_playlist(self, folder_path, playlist_name):
         """Uploads all videos in a folder and adds them to a new playlist."""
         video_infos = []
