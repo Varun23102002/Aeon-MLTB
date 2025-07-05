@@ -68,7 +68,8 @@ class YouTubeHelper:
 
         if user_id:
             if user_id:
-            token_path = f"{user_id}.pickle"
+            token_path = f"tokens/{user_id}.pickle"
+
 
         if ospath.exists(token_path):
             LOGGER.info(f"Authorize YouTube with {token_path}")
