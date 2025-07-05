@@ -39,12 +39,16 @@ class YouTubeUpload(YouTubeHelper):
         # Category validation (safe fallback: 22)
         self.category = str(category)
         if not self.category.isdigit():
-            LOGGER.warning(f"Invalid category ID '{self.category}', defaulting to '22'")
+            LOGGER.warning(
+                f"Invalid category ID '{self.category}', defaulting to '22'"
+            )
             self.category = "22"
         # Upload mode validation
         self.upload_mode = (upload_mode or "playlist").lower()
         if self.upload_mode not in ("playlist", "individual"):
-            LOGGER.warning(f"Invalid upload_mode '{self.upload_mode}', defaulting to 'playlist'")
+            LOGGER.warning(
+                f"Invalid upload_mode '{self.upload_mode}', defaulting to 'playlist'"
+            )
             self.upload_mode = "playlist"
         self.description = description
         self.playlist_id = playlist_id
@@ -534,7 +538,9 @@ class YouTubeUpload(YouTubeHelper):
         # Defensive: validate category_id before use
         category_id = str(self.category)
         if not category_id.isdigit():
-            LOGGER.warning(f"Invalid category ID '{category_id}', defaulting to '22'")
+            LOGGER.warning(
+                f"Invalid category ID '{category_id}', defaulting to '22'"
+            )
             category_id = "22"
         description_base = (
             self.description if self.description else f"Uploaded: {file_name}"
