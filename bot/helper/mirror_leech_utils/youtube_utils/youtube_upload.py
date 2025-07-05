@@ -39,7 +39,7 @@ class YouTubeUpload(YouTubeHelper):
         self.category = category
         self.description = description
         self.playlist_id = playlist_id
-        self.upload_mode = upload_mode or "playlist"
+        self.upload_mode = upload_mode.lower() if upload_mode else "playlist"
         super().__init__()
         self.is_uploading = True
 
